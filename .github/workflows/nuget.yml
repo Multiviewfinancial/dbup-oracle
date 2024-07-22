@@ -23,7 +23,9 @@ jobs:
       uses: microsoft/setup-msbuild@v1
     - name: Get current date and time 
       id: date
-      run: echo "::set-output name=date::$(date +'%Y.%m.%d.%H%M%S')"      
+      run: echo "::set-output name=date::$(date +'%Y.%m.%d.%H%M%S')"
+    - name: Restore dependencies
+      run: dotnet restore
     - name: Build
       run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PreferredToolArchitecture="ANY CPU" src\dbup-oracle.sln
     - name: Pack From Main Branches
