@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using DbUp.Support;
 
 namespace DbUp.Oracle
 {
     public class OracleCommandSplitter
     {
-        private readonly Func<string, SqlCommandReader> commandReaderFactory;
+        private char _delimiter;
 
         [Obsolete]
         public OracleCommandSplitter()
         {
-            this.commandReaderFactory = scriptContents => new OracleCommandReader(scriptContents);
+            _delimiter = '/';
         }
 
         public OracleCommandSplitter(char delimiter)
         {
-            this.commandReaderFactory = scriptContents => new OracleCustomDelimiterCommandReader(scriptContents, delimiter);
+            _delimiter = delimiter;
         }
 
         /// <summary>
@@ -26,12 +28,10 @@ namespace DbUp.Oracle
         /// <returns></returns>
         public IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
         {
-            using (var reader = commandReaderFactory(scriptContents))
-            {
-                var commands = new List<string>();
-                reader.ReadAllCommands(c => commands.Add(c));
-                return commands;
-            }
+            string pattern = @$"(?m)^\s*{_delimiter}\s*$";
+            string[] segments = Regex.Split(scriptContents, pattern).
+                Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToArray(); 
+            return segments;
         }
     }
 }
