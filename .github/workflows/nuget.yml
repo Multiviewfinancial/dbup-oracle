@@ -25,7 +25,7 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +'%Y.%m.%d.%H%M%S')"
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src\dbup-oracle.sln
     - name: Build
       run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PreferredToolArchitecture="ANY CPU" src\dbup-oracle.sln
     - name: Pack From Main Branches
