@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
  <package>
   <metadata>
-    <id>Multiview.dbup-oracle.dbup-oracle</id>
+    <id>Multiview.dbup-oracle</id>
     <version>1</version>
     <authors>Multiview Financial</authors>
     <owners>Multiview Financial</owners>
