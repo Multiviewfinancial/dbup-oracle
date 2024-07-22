@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <package>
+  <metadata>
+    <id>Multiview.dbup-oracle.dbup-oracle</id>
+    <version>1</version>
+    <authors>Multiview Financial</authors>
+    <owners>Multiview Financial</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MultiviewFinancialdbuporacle</description>
+    <copyright>Copyright Multiview Financial</copyright>
+    <repository type="git" url="https://github.com/Multiviewfinancial/dbup-oracle"></repository>
+  </metadata>
+
+  <files>
+    <file src=".\bin\Release\netstandard2.0\*.dll" target="lib\netstandard2.0" />
+  </files>
+</package>

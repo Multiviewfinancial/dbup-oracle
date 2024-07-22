@@ -1,0 +1,35 @@
+name: create nuget package
+on:
+  # after merge to one of the following branches we create a nuget package 
+  push:
+    branches: [ master, '*-RELEASE', 'FT-*' ]
+
+ # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        source-url: https://nuget.pkg.github.com/Multiviewfinancial/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup MSBuild    
+      uses: microsoft/setup-msbuild@v1
+    - name: Get current date and time 
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y.%m.%d.%H%M%S')"      
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PlatformToolset=v143 /p:PreferredToolArchitecture="ANY CPU" dbup-oracle.sln
+    - name: Pack From Main Branches
+      run: msbuild -t:pack .\dbup-oracle\dbup-oracle.csproj  -p:NuspecFile=.\nuget.nuspec  -p:PackageVersion=${{ steps.date.outputs.date }} /p:NoBuild=true /p:NoDependencies=true /p:OutputPath=..\..\
+      continue-on-error: true
+    - name: PushGithub
+      run: dotnet nuget push *.nupkg --source https://nuget.pkg.github.com/Multiviewfinancial/index.json --no-symbols --skip-duplicate --api-key ${{ github.token }}
