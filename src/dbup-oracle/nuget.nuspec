@@ -9,6 +9,10 @@
     <description>MultiviewFinancialdbuporacle</description>
     <copyright>Copyright Multiview Financial</copyright>
     <repository type="git" url="https://github.com/Multiviewfinancial/dbup-oracle"></repository>
+
+    <dependencies>
+        <group targetFramework=".NETStandard2.0" />
+    </dependencies> 
   </metadata>
 
   <files>
