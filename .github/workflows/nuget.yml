@@ -24,8 +24,6 @@ jobs:
     - name: Get current date and time 
       id: date
       run: echo "::set-output name=date::$(date +'%Y.%m.%d.%H%M%S')"      
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Build
       run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PlatformToolset=v143 /p:PreferredToolArchitecture="ANY CPU" dbup-oracle.sln
     - name: Pack From Main Branches
