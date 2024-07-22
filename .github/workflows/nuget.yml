@@ -25,7 +25,7 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +'%Y.%m.%d.%H%M%S')"      
     - name: Build
-      run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PlatformToolset=v143 /p:PreferredToolArchitecture="ANY CPU" dbup-oracle.sln
+      run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PlatformToolset=v143 /p:PreferredToolArchitecture="ANY CPU" dbup-oracle\src\dbup-oracle.sln
     - name: Pack From Main Branches
       run: msbuild -t:pack .\dbup-oracle\dbup-oracle.csproj  -p:NuspecFile=.\nuget.nuspec  -p:PackageVersion=${{ steps.date.outputs.date }} /p:NoBuild=true /p:NoDependencies=true /p:OutputPath=..\..\
       continue-on-error: true
