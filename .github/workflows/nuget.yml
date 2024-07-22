@@ -29,7 +29,7 @@ jobs:
     - name: Build
       run: msbuild.exe /p:Configuration=Release /p:Platform="ANY CPU" /p:PreferredToolArchitecture="ANY CPU" src\dbup-oracle.sln
     - name: Pack From Main Branches
-      run: msbuild -t:pack .\dbup-oracle\dbup-oracle.csproj  -p:NuspecFile=.\nuget.nuspec  -p:PackageVersion=${{ steps.date.outputs.date }} /p:NoBuild=true /p:NoDependencies=true /p:OutputPath=..\..\
+      run: msbuild -t:pack src\dbup-oracle\dbup-oracle.csproj  -p:NuspecFile=.\nuget.nuspec  -p:PackageVersion=${{ steps.date.outputs.date }} /p:NoBuild=true /p:NoDependencies=true /p:OutputPath=..\..\
       continue-on-error: true
     - name: PushGithub
       run: dotnet nuget push *.nupkg --source https://nuget.pkg.github.com/Multiviewfinancial/index.json --no-symbols --skip-duplicate --api-key ${{ github.token }}
