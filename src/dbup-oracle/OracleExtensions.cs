@@ -43,8 +43,9 @@ namespace DbUp.Oracle
         /// <returns>
         /// A builder for a database upgrader designed for Oracle databases.
         /// </returns>
-        public static UpgradeEngineBuilder OracleDatabaseWithDefaultDelimiter(this SupportedDatabases supported, string connectionString)
-            => OracleDatabase(supported, connectionString, '/');
+        public static UpgradeEngineBuilder OracleDatabaseWithDefaultDelimiter(this SupportedDatabases supported, string connectionString, 
+            string journalTableSchema = null, string journalTableName = null)
+            => OracleDatabase(supported, connectionString, '/', journalTableSchema, journalTableName);
 
         /// <summary>
         /// Create an upgrader for Oracle databases that uses the <c>;</c> character as the delimiter between statements.
@@ -54,8 +55,9 @@ namespace DbUp.Oracle
         /// <returns>
         /// A builder for a database upgrader designed for Oracle databases.
         /// </returns>
-        public static UpgradeEngineBuilder OracleDatabaseWithSemicolonDelimiter(this SupportedDatabases supported, string connectionString)
-            => OracleDatabase(supported, connectionString, ';');
+        public static UpgradeEngineBuilder OracleDatabaseWithSemicolonDelimiter(this SupportedDatabases supported, string connectionString, 
+            string journalTableSchema, string journalTableName)
+            => OracleDatabase(supported, connectionString, ';', journalTableSchema, journalTableName);
 
         /// <summary>
         /// Create an upgrader for Oracle databases.
@@ -66,14 +68,18 @@ namespace DbUp.Oracle
         /// <returns>
         /// A builder for a database upgrader designed for Oracle databases.
         /// </returns>
-        public static UpgradeEngineBuilder OracleDatabase(this SupportedDatabases supported, string connectionString, char delimiter)
+        public static UpgradeEngineBuilder OracleDatabase(this SupportedDatabases supported, string connectionString, char delimiter, 
+            string journalTableSchema = null, string journalTableName = null)
         {
-            foreach (var pair in connectionString.Split(';').Select(s => s.Split('=')).Where(pair => pair.Length == 2).Where(pair => pair[0].ToLower() == "database"))
+            if (string.IsNullOrEmpty(journalTableSchema))
             {
-                return OracleDatabase(new OracleConnectionManager(connectionString, new OracleCommandSplitter(delimiter)), pair[1]);
+                foreach (var pair in connectionString.Split(';').Select(s => s.Split('=')).Where(pair => pair.Length == 2).Where(pair => pair[0].ToLower() == "database"))
+                {
+                    journalTableSchema = pair[1];
+                }
             }
 
-            return OracleDatabase(new OracleConnectionManager(connectionString, new OracleCommandSplitter(delimiter)));
+            return OracleDatabase(new OracleConnectionManager(connectionString, new OracleCommandSplitter(delimiter)), journalTableSchema, journalTableName);
         }
 
         /// <summary>
@@ -161,12 +167,17 @@ namespace DbUp.Oracle
         /// <returns>
         /// A builder for a database upgrader designed for Oracle databases.
         /// </returns>
-        public static UpgradeEngineBuilder OracleDatabase(IConnectionManager connectionManager, string schema)
+        public static UpgradeEngineBuilder OracleDatabase(IConnectionManager connectionManager, string schema, string journalTableName = null)
         {
+            if (string.IsNullOrEmpty(journalTableName))
+            {
+                journalTableName = "schemaversions";
+            }
+
             var builder = new UpgradeEngineBuilder();
             builder.Configure(c => c.ConnectionManager = connectionManager);
             builder.Configure(c => c.ScriptExecutor = new OracleScriptExecutor(() => c.ConnectionManager, () => c.Log, null, () => c.VariablesEnabled, c.ScriptPreprocessors, () => c.Journal));
-            builder.Configure(c => c.Journal = new OracleTableJournal(() => c.ConnectionManager, () => c.Log, schema, "schemaversions"));
+            builder.Configure(c => c.Journal = new OracleTableJournal(() => c.ConnectionManager, () => c.Log, schema, journalTableName));
             builder.WithPreprocessor(new OraclePreprocessor());
             return builder;
         }
