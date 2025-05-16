@@ -28,14 +28,11 @@ namespace DbUp.Oracle
         /// <returns></returns>
         public IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
         {
-            //string pattern = @$"^\s*\s*$";
-
-            string pattern = @"(?:^|\r?\n|\r)\s*/\s*(?=\r?\n|\r|$)"; //match a / at the beginning of a line.
-                                                                     //Complicated because of the need to match the newline character on windows and linux?
-            
-            
-            string[] segments = Regex.Split(scriptContents, pattern, RegexOptions.Multiline).
-                Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToArray(); 
+            // Split on lines that contain only the delimiter (optionally surrounded by whitespace)
+            string pattern = $@"^\s*{Regex.Escape(_delimiter.ToString())}\s*$";
+            var segments = Regex.Split(scriptContents, pattern, RegexOptions.Multiline)
+            .Select(s => s.Trim())
+            .Where(s => !string.IsNullOrEmpty(s));
             return segments;
         }
     }
