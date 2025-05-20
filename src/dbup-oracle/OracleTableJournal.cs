@@ -130,6 +130,7 @@ namespace DbUp.Oracle
         /// </summary>
         /// <param name="dbCommandFactory">A factory method to create database commands.</param>
         /// <param name="olderThan">The date to compare against.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         public async Task DeleteOldJournalEntriesAsync(Func<IDbCommand> dbCommandFactory,
         DateTime olderThan, 
         CancellationToken cancellationToken = default)
