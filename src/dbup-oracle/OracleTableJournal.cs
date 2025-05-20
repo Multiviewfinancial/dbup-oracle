@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using DbUp.Engine.Output;
 using DbUp.Engine.Transactions;
 using DbUp.Support;
@@ -33,7 +35,7 @@ namespace DbUp.Oracle
                     schemaversionid NUMBER(10),
                     scriptname VARCHAR2(255) NOT NULL,
                     applied TIMESTAMP NOT NULL,
-                    CONSTRAINT PK_{ fqSchemaTableName } PRIMARY KEY (schemaversionid) 
+                    CONSTRAINT PK_{fqSchemaTableName} PRIMARY KEY (schemaversionid) 
                 )";
         }
 
@@ -121,6 +123,34 @@ namespace DbUp.Oracle
             }
 
             journalExists = true;
+        }
+                
+        /// <summary>
+        /// Deletes journal entries older than the specified date.
+        /// </summary>
+        /// <param name="dbCommandFactory">A factory method to create database commands.</param>
+        /// <param name="olderThan">The date to compare against.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        public async Task DeleteOldJournalEntriesAsync(Func<IDbCommand> dbCommandFactory,
+        DateTime olderThan, 
+        CancellationToken cancellationToken = default)
+        {
+            var unquotedSchemaTableName = UnquotedSchemaTableName.ToUpper(English);
+            var command = dbCommandFactory();
+
+            if (command is not System.Data.Common.DbCommand dbCommand)
+            {
+                throw new InvalidOperationException("The provided command does not support async operations.");
+            }
+
+            dbCommand.CommandText = $"delete from {unquotedSchemaTableName} where applied < :olderThan";
+            dbCommand.CommandType = CommandType.Text;
+            var parameter = dbCommand.CreateParameter();
+            parameter.ParameterName = "olderThan";
+            parameter.Value = olderThan;
+            dbCommand.Parameters.Add(parameter);
+
+            await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }
