@@ -138,7 +138,9 @@ namespace DbUp.Oracle
             var command = dbCommandFactory();
 
             if (command is not System.Data.Common.DbCommand dbCommand)
-            throw new InvalidOperationException("The provided command does not support async operations.");
+            {
+                throw new InvalidOperationException("The provided command does not support async operations.");
+            }
 
             dbCommand.CommandText = $"delete from {unquotedSchemaTableName} where applied < :olderThan";
             dbCommand.CommandType = CommandType.Text;
