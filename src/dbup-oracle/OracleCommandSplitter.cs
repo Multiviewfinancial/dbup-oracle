@@ -29,8 +29,8 @@ namespace DbUp.Oracle
         public IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
         {
             // Split on lines that contain only the delimiter (optionally surrounded by whitespace)
-            string pattern = $@"^\s*{Regex.Escape(_delimiter.ToString())}\s*$";
-            var segments = Regex.Split(scriptContents, pattern, RegexOptions.Multiline)
+            // Using the cached _compiledRegex for splitting
+            var segments = _compiledRegex.Split(scriptContents)
             .Select(s => s.Trim())
             .Where(s => !string.IsNullOrEmpty(s));
             return segments;
