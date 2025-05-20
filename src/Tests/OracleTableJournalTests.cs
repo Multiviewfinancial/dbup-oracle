@@ -8,7 +8,7 @@ using Xunit;
 
 namespace DbUp.Oracle.Tests
 {
-    public class OracleTableJournalTest
+    public class OracleTableJournalTests
     {
         [Fact]
         public async Task DeleteOldJournalEntriesAsync_DeletesEntriesOlderThanSpecifiedDate()
